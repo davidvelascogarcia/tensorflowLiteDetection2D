@@ -2,7 +2,9 @@
 
 # Lenguaje de programación
 
-language: python 3.5
+language: python
+python:
+   - "3.5"
 
 # Sistema operativo destino a probar
 
