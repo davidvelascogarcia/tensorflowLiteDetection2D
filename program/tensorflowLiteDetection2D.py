@@ -108,16 +108,16 @@ image_w = 640
 image_h = 480
 
 # Prepare input image buffer
-in_buf_array = np.ones((image_h, image_w, 3), dtype = np.uint8)
+in_buf_array = np.ones((image_h, image_w, 3), np.uint8)
 in_buf_image = yarp.ImageRgb()
 in_buf_image.resize(image_w, image_h)
-in_buf_image.setExternal(in_buf_array, in_buf_array.shape[1], in_buf_array.shape[0])
+in_buf_image.setExternal(in_buf_array.data, in_buf_array.shape[1], in_buf_array.shape[0])
 
 # Prepare output image buffer
 out_buf_image = yarp.ImageRgb()
 out_buf_image.resize(image_w, image_h)
-out_buf_array = np.zeros((image_h, image_w, 3), dtype = np.uint8)
-out_buf_image.setExternal(out_buf_array, out_buf_array.shape[1], out_buf_array.shape[0])
+out_buf_array = np.zeros((image_h, image_w, 3), np.uint8)
+out_buf_image.setExternal(out_buf_array.data, out_buf_array.shape[1], out_buf_array.shape[0])
 
 
 print("")
