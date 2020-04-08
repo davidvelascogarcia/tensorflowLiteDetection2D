@@ -4,6 +4,7 @@
 
 - [Introduction](#introduction)
 - [Trained Models](#trained-models)
+- [Running Software](#running-software)
 - [Requirements](#requirements)
 - [Status](#status)
 - [Related projects](#related-projects)
@@ -23,7 +24,7 @@
 
 `tensorflowLiteDetection2D` requires a model to detect. Models should be located in [models](./models) dir. 
 
-## Running software
+## Running Software
 
 1. Create or configure YARP Server.
 ```bash
