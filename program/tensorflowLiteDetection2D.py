@@ -249,11 +249,19 @@ while True:
             print("Coordinates:")
             print("X: ", x)
             print("Y: ", y)
+            coordinatesXY=str(x)+", "+str(y)
+            detectionScore=int(scores[i]*100)
 
             # Sending processed detection
             cmd.clear()
+            cmd.addString("Detection number:")
+            cmd.addInt(i)
             cmd.addString("Detection:")
-            cmd.addString(label)
+            cmd.addString(object_name)
+            cmd.addString("Score:")
+            cmd.addInt(detectionScore)
+            cmd.addString("Coordinates:")
+            cmd.addString(coordinatesXY)
             tensorflowLiteDetection2D_portOutDet.write(cmd)
 
             # Sending coordinates detection
