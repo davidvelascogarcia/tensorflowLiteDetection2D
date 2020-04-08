@@ -32,7 +32,7 @@ yarp server
 
 yarp conf pc-ip 10000
 ```
-2. Execute [script/tensorflowLiteDetection2D.py](./programs) the detector.
+2. Execute [programs/tensorflowLiteDetection2D.py](./programs) the detector.
 ```python
 python3 tensorflowLiteDetection2D.py
 ```
