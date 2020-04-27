@@ -68,7 +68,7 @@ install:
 
 before_script:
 
-  - cd programs
+  - cd program
 
 # Compilamos
 
