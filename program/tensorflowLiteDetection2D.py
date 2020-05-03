@@ -23,15 +23,15 @@
 '''
 
 # Libraries
-
+import argparse
+import cv2
+import datetime
+import glob
+import importlib.util
 import os
 import sys
 import time
 from threading import Thread
-import importlib.util
-import argparse
-import cv2
-import glob
 import numpy as np
 import yarp
 
@@ -245,8 +245,8 @@ while True:
             cv2.rectangle(in_buf_array, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
 
             # Put label in OpenCV image
-            object_name = labels[int(classes[i])]
-            label = '%s: %d%%' % (object_name, int(scores[i]*100))
+            detectionObjectName = labels[int(classes[i])]
+            label = '%s: %d%%' % (detectionObjectName, int(scores[i]*100))
             labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
             label_ymin = max(ymin, labelSize[1] + 10)
 
@@ -257,27 +257,38 @@ while True:
             x=(xmin+xmin+labelSize[0])/2
             y=image_h-label_ymin+baseLine-10
 
+            # Get detection time
+            detectionTime = datetime.datetime.now()
+
+            # Prepare coordinates and score
+            coordinatesXY=str(x)+", "+str(y)
+            detectionScore=int(scores[i]*100)
+
             # Print processed data
-            print ("\n")
-            print ('Detection:')
-            print (label)
-            print("\n")
+            print("")
+            print("")
+            print("**************************************************************************")
+            print("Resume:")
+            print("**************************************************************************")
+            print ("")
+            print ("Detection: "+str(detectionObjectName)+" "+str(detectionScore)+"%")
             print("Coordinates:")
             print("X: ", x)
             print("Y: ", y)
-            coordinatesXY=str(x)+", "+str(y)
-            detectionScore=int(scores[i]*100)
+            print("Detection time: "+str(detectionTime))
 
             # Sending processed detection
             cmd.clear()
             cmd.addString("Detection number:")
             cmd.addInt(i)
             cmd.addString("Detection:")
-            cmd.addString(object_name)
+            cmd.addString(detectionObjectName)
             cmd.addString("Score:")
             cmd.addInt(detectionScore)
             cmd.addString("Coordinates:")
             cmd.addString(coordinatesXY)
+            cmd.addString("Detection time:")
+            cmd.addString(str(detectionTime))
             tensorflowLiteDetection2D_portOutDet.write(cmd)
 
             # Sending coordinates detection
@@ -289,6 +300,7 @@ while True:
             tensorflowLiteDetection2D_portOutCoord.write(coordinates)
 
     # Sending processed image
+    print("")
     print ('Sending processed image...')
     out_buf_array[:,:] = in_buf_array
     tensorflowLiteDetection2D_portOut.write(out_buf_image)
