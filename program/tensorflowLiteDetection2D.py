@@ -58,6 +58,13 @@ print("Starting system...")
 print("")
 print("Loading tensorflowLiteDetection2D module...")
 
+
+
+print("")
+print("")
+print("**************************************************************************")
+print("YARP configuration:")
+print("**************************************************************************")
 print("")
 print("Initializing YARP network...")
 
@@ -119,7 +126,11 @@ out_buf_image.resize(image_w, image_h)
 out_buf_array = np.zeros((image_h, image_w, 3), np.uint8)
 out_buf_image.setExternal(out_buf_array.data, out_buf_array.shape[1], out_buf_array.shape[0])
 
-
+print("")
+print("")
+print("**************************************************************************")
+print("Configuration models:")
+print("**************************************************************************")
 print("")
 print("Loading Tensorflow Lite model...")
 
@@ -187,6 +198,11 @@ inputSTD = 127.5
 
 print("")
 print("Waiting input image source...")
+print("")
+print("")
+print("**************************************************************************")
+print("Processing:")
+print("**************************************************************************")
 while True:
 
     # Recieve image source
@@ -284,3 +300,9 @@ tensorflowLiteDetection2D_portIn.close()
 tensorflowLiteDetection2D_portOut.close()
 tensorflowLiteDetection2D_portOutDet.close()
 tensorflowLiteDetection2D_portOutCoord.close()
+
+print("")
+print("")
+print("**************************************************************************")
+print("Program finished")
+print("**************************************************************************")
