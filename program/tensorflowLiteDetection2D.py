@@ -53,10 +53,10 @@ print("*************************************************************************
 print("**************************************************************************")
 
 print("")
-print("Starting system...")
+print("Starting system ...")
 
 print("")
-print("Loading tensorflowLiteDetection2D module...")
+print("Loading tensorflowLiteDetection2D module ...")
 
 
 
@@ -66,14 +66,14 @@ print("*************************************************************************
 print("YARP configuration:")
 print("**************************************************************************")
 print("")
-print("Initializing YARP network...")
+print("Initializing YARP network ...")
 
 # Init YARP Network
 yarp.Network.init()
 
 
 print("")
-print("Opening image input port with name /tensorflowLiteDetection2D/img:i...")
+print("[INFO] Opening image input port with name /tensorflowLiteDetection2D/img:i ...")
 
 # Open input image port
 tensorflowLiteDetection2D_portIn = yarp.BufferedPortImageRgb()
@@ -81,7 +81,7 @@ tensorflowLiteDetection2D_portNameIn = '/tensorflowLiteDetection2D/img:i'
 tensorflowLiteDetection2D_portIn.open(tensorflowLiteDetection2D_portNameIn)
 
 print("")
-print("Opening image output port with name /tensorflowLiteDetection2D/img:o...")
+print("[INFO] Opening image output port with name /tensorflowLiteDetection2D/img:o ...")
 
 # Open output image port
 tensorflowLiteDetection2D_portOut = yarp.Port()
@@ -89,7 +89,7 @@ tensorflowLiteDetection2D_portNameOut = '/tensorflowLiteDetection2D/img:o'
 tensorflowLiteDetection2D_portOut.open(tensorflowLiteDetection2D_portNameOut)
 
 print("")
-print("Opening data output port with name /tensorflowLiteDetection2D/data:o...")
+print("[INFO] Opening data output port with name /tensorflowLiteDetection2D/data:o ...")
 
 # Open output data port
 tensorflowLiteDetection2D_portOutDet = yarp.Port()
@@ -97,7 +97,7 @@ tensorflowLiteDetection2D_portNameOutDet = '/tensorflowLiteDetection2D/data:o'
 tensorflowLiteDetection2D_portOutDet.open(tensorflowLiteDetection2D_portNameOutDet)
 
 print("")
-print("Opening data output port with name /tensorflowLiteDetection2D/coord:o...")
+print("[INFO] Opening data output port with name /tensorflowLiteDetection2D/coord:o ...")
 
 # Open output coordinates data port
 tensorflowLiteDetection2D_portOutCoord = yarp.Port()
@@ -152,17 +152,17 @@ minThresholdConfig = float(argsParser.threshold)
 
 # Get directory path
 print("")
-print("Getting directory path...")
+print("Getting directory path ...")
 directoryPath = os.getcwd()
 
 # Get model graph path
 print("")
-print("Getting graph model path...")
+print("Getting graph model path ...")
 graphModelPath = os.path.join(directoryPath,dirName,graphName)
 
 # Get model label path
 print("")
-print("Getting label model path...")
+print("Getting label model path ...")
 labelMapPath = os.path.join(directoryPath,dirName,labelName)
 
 # Load the label map
@@ -180,7 +180,7 @@ if labels[0] == '???':
 
 # Load the Tensorflow Lite model
 print("")
-print("Loading model...")
+print("Loading model ...")
 interpretObject = Interpreter(model_path=graphModelPath)
 
 interpretObject.allocate_tensors()
@@ -197,7 +197,7 @@ inputMean = 127.5
 inputSTD = 127.5
 
 print("")
-print("Waiting input image source...")
+print("Waiting input image source ...")
 print("")
 print("")
 print("**************************************************************************")
@@ -271,11 +271,11 @@ while True:
             print("Resume:")
             print("**************************************************************************")
             print ("")
-            print ("Detection: "+str(detectionObjectName)+" "+str(detectionScore)+"%")
-            print("Coordinates:")
+            print ("[RESULTS] Detection: "+str(detectionObjectName)+" "+str(detectionScore)+"%")
+            print("[INFO] Coordinates:")
             print("X: ", x)
             print("Y: ", y)
-            print("Detection time: "+str(detectionTime))
+            print("[INFO] Detection time: "+str(detectionTime))
 
             # Sending processed detection
             cmd.clear()
@@ -301,13 +301,13 @@ while True:
 
     # Sending processed image
     print("")
-    print ('Sending processed image...')
+    print("Sending processed image ...")
     out_buf_array[:,:] = in_buf_array
     tensorflowLiteDetection2D_portOut.write(out_buf_image)
 
 
 # Close YARP ports
-print ('Closing ports...')
+print("Closing ports ...")
 tensorflowLiteDetection2D_portIn.close()
 tensorflowLiteDetection2D_portOut.close()
 tensorflowLiteDetection2D_portOutDet.close()
