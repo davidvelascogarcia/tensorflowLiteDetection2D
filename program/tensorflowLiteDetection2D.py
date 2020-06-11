@@ -1,12 +1,9 @@
 '''
- * ************************************************************
- *      Program: Tensorflow Lite Detection 2D Module
- *      Type: Python
- *      Author: David Velasco Garcia @davidvelascogarcia
- * ************************************************************
- */
-
-/*
+  * ************************************************************
+  *      Program: Tensorflow Lite Detection 2D Module
+  *      Type: Python
+  *      Author: David Velasco Garcia @davidvelascogarcia
+  * ************************************************************
   *
   * | INPUT PORT                           | CONTENT                                                 |
   * |--------------------------------------|---------------------------------------------------------|
@@ -18,8 +15,6 @@
   * | /tensorflowLiteDetection2D/img:o     | Output image with detection                             |
   * | /tensorflowLiteDetection2D/data:o    | Output result, recognition data                         |
   * | /tensorflowLiteDetection2D/coord:o   | Output result, recognition coordinates                  |
-
-  *
 '''
 
 # Libraries
@@ -42,8 +37,8 @@ if pkg:
 else:
     from tensorflow.lite.python.interpreter import Interpreter
 
-
-
+print("")
+print("")
 print("**************************************************************************")
 print("**************************************************************************")
 print("                 Program: Tensorflow Lite Detector 2D                     ")
@@ -105,10 +100,10 @@ tensorflowLiteDetection2D_portNameOutCoord = '/tensorflowLiteDetection2D/coord:o
 tensorflowLiteDetection2D_portOutCoord.open(tensorflowLiteDetection2D_portNameOutCoord)
 
 # Create data bootle
-cmd=yarp.Bottle()
+outputBottleTensorflowLiteDetection2D = yarp.Bottle()
 
 # Create coordinates bootle
-coordinates=yarp.Bottle()
+coordinatesBottleTensorflowLiteDetection2D = yarp.Bottle()
 
 # Image size
 image_w = 640
@@ -203,6 +198,7 @@ print("")
 print("**************************************************************************")
 print("Processing:")
 print("**************************************************************************")
+
 while True:
 
     # Recieve image source
@@ -254,15 +250,15 @@ while True:
             cv2.putText(in_buf_array, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
 
-            x=(xmin+xmin+labelSize[0])/2
-            y=image_h-label_ymin+baseLine-10
+            x = (xmin + xmin + labelSize[0])/2
+            y = image_h - label_ymin + baseLine - 10
 
             # Get detection time
             detectionTime = datetime.datetime.now()
 
             # Prepare coordinates and score
-            coordinatesXY=str(x)+", "+str(y)
-            detectionScore=int(scores[i]*100)
+            coordinatesXY = str(x) + ", " + str(y)
+            detectionScore = int(scores[i] * 100)
 
             # Print processed data
             print("")
@@ -270,44 +266,44 @@ while True:
             print("**************************************************************************")
             print("Resume:")
             print("**************************************************************************")
-            print ("")
-            print ("[RESULTS] Detection: "+str(detectionObjectName)+" "+str(detectionScore)+"%")
+            print("")
+            print("[RESULTS] Detection: " + str(detectionObjectName) + " " + str(detectionScore) + "%")
             print("[INFO] Coordinates:")
             print("X: ", x)
             print("Y: ", y)
-            print("[INFO] Detection time: "+str(detectionTime))
+            print("[INFO] Detection time: " + str(detectionTime))
 
             # Sending processed detection
-            cmd.clear()
-            cmd.addString("Detection number:")
-            cmd.addInt(i)
-            cmd.addString("Detection:")
-            cmd.addString(detectionObjectName)
-            cmd.addString("Score:")
-            cmd.addInt(detectionScore)
-            cmd.addString("Coordinates:")
-            cmd.addString(coordinatesXY)
-            cmd.addString("Detection time:")
-            cmd.addString(str(detectionTime))
-            tensorflowLiteDetection2D_portOutDet.write(cmd)
+            outputBottleTensorflowLiteDetection2D.clear()
+            outputBottleTensorflowLiteDetection2D.addString("Detection number:")
+            outputBottleTensorflowLiteDetection2D.addInt(i)
+            outputBottleTensorflowLiteDetection2D.addString("Detection:")
+            outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
+            outputBottleTensorflowLiteDetection2D.addString("Score:")
+            outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
+            outputBottleTensorflowLiteDetection2D.addString("Coordinates:")
+            outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
+            outputBottleTensorflowLiteDetection2D.addString("Detection time:")
+            outputBottleTensorflowLiteDetection2D.addString(str(detectionTime))
+            tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
 
             # Sending coordinates detection
-            coordinates.clear()
-            coordinates.addString("X: ")
-            coordinates.addString(str(x))
-            coordinates.addString("Y: ")
-            coordinates.addString(str(y))
-            tensorflowLiteDetection2D_portOutCoord.write(coordinates)
+            coordinatesBottleTensorflowLiteDetection2D.clear()
+            coordinatesBottleTensorflowLiteDetection2D.addString("X: ")
+            coordinatesBottleTensorflowLiteDetection2D.addString(str(x))
+            coordinatesBottleTensorflowLiteDetection2D.addString("Y: ")
+            coordinatesBottleTensorflowLiteDetection2D.addString(str(y))
+            tensorflowLiteDetection2D_portOutCoord.write(coordinatesBottleTensorflowLiteDetection2D)
 
     # Sending processed image
     print("")
-    print("Sending processed image ...")
+    print("[INFO] Sending processed image at " + str(detectionTime) + " ...")
     out_buf_array[:,:] = in_buf_array
     tensorflowLiteDetection2D_portOut.write(out_buf_image)
 
 
 # Close YARP ports
-print("Closing ports ...")
+print("[INFO] Closing ports ...")
 tensorflowLiteDetection2D_portIn.close()
 tensorflowLiteDetection2D_portOut.close()
 tensorflowLiteDetection2D_portOutDet.close()
@@ -318,3 +314,5 @@ print("")
 print("**************************************************************************")
 print("Program finished")
 print("**************************************************************************")
+print("")
+print("tensorflowLiteDetection2D program finished correctly.")
