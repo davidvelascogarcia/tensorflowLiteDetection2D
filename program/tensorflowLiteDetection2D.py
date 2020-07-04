@@ -303,6 +303,9 @@ while int(loopControlReceiveImageSource) == 0:
             print("[INFO] Object not detected.")
             print("")
 
+            # Get detection time
+            detectionTime = datetime.datetime.now()
+
             # Sending processed detection
             outputBottleTensorflowLiteDetection2D.clear()
             outputBottleTensorflowLiteDetection2D.addString("Detection number:")
