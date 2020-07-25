@@ -48,23 +48,27 @@ print("*************************************************************************
 
 print("")
 print("Starting system ...")
+print("")
 
 print("")
 print("Loading tensorflowLiteDetection2D module ...")
-
 print("")
+
+
 print("")
 print("**************************************************************************")
 print("YARP configuration:")
 print("**************************************************************************")
 print("")
 print("Initializing YARP network ...")
+print("")
 
 # Init YARP Network
 yarp.Network.init()
 
 print("")
 print("[INFO] Opening image input port with name /tensorflowLiteDetection2D/img:i ...")
+print("")
 
 # Open input image port
 tensorflowLiteDetection2D_portIn = yarp.BufferedPortImageRgb()
@@ -73,6 +77,7 @@ tensorflowLiteDetection2D_portIn.open(tensorflowLiteDetection2D_portNameIn)
 
 print("")
 print("[INFO] Opening image output port with name /tensorflowLiteDetection2D/img:o ...")
+print("")
 
 # Open output image port
 tensorflowLiteDetection2D_portOut = yarp.Port()
@@ -81,6 +86,7 @@ tensorflowLiteDetection2D_portOut.open(tensorflowLiteDetection2D_portNameOut)
 
 print("")
 print("[INFO] Opening data output port with name /tensorflowLiteDetection2D/data:o ...")
+print("")
 
 # Open output data port
 tensorflowLiteDetection2D_portOutDet = yarp.Port()
@@ -107,12 +113,16 @@ out_buf_array = np.zeros((image_h, image_w, 3), np.uint8)
 out_buf_image.setExternal(out_buf_array.data, out_buf_array.shape[1], out_buf_array.shape[0])
 
 print("")
+print("[INFO] YARP network configured correctly.")
+print("")
+
 print("")
 print("**************************************************************************")
 print("Configuration models:")
 print("**************************************************************************")
 print("")
-print("Loading Tensorflow Lite model...")
+print("Loading Tensorflow Lite model ...")
+print("")
 
 # Configure parser arguments
 parserConfig = argparse.ArgumentParser()
@@ -132,17 +142,20 @@ minThresholdConfig = float(argsParser.threshold)
 
 # Get directory path
 print("")
-print("Getting directory path ...")
+print("Getting directory path at " + str(datetime.datetime.now()) + " ...")
+print("")
 directoryPath = os.getcwd()
 
 # Get model graph path
 print("")
-print("Getting graph model path ...")
+print("Getting graph model path at " + str(datetime.datetime.now()) + " ...")
+print("")
 graphModelPath = os.path.join(directoryPath, dirName, graphName)
 
 # Get model label path
 print("")
-print("Getting label model path ...")
+print("Getting label model path at " + str(datetime.datetime.now()) + " ...")
+print("")
 labelMapPath = os.path.join(directoryPath, dirName, labelName)
 
 # Load the label map
@@ -154,13 +167,13 @@ Trick:
 Error using the COCO "starter model", the first label with "???" name.
 Delete error in the first label.
 '''
-
 if labels[0] == '???':
     del(labels[0])
 
 # Load the Tensorflow Lite model
 print("")
-print("Loading model ...")
+print("[INFO Loading model at " + str(datetime.datetime.now()) + " ...")
+print("")
 interpretObject = Interpreter(model_path = graphModelPath)
 interpretObject.allocate_tensors()
 
@@ -176,15 +189,13 @@ inputMean = 127.5
 inputSTD = 127.5
 
 print("")
-print("[INFO] Models loaded correctly.")
+print("[INFO] Models loaded correctly at " + str(datetime.datetime.now()) + ".")
 print("")
 
-print("")
 print("")
 print("**************************************************************************")
 print("Waiting for input image source:")
 print("**************************************************************************")
-print("")
 print("")
 print("Waiting input image source ...")
 print("")
@@ -194,12 +205,12 @@ loopControlReceiveImageSource = 0
 while int(loopControlReceiveImageSource) == 0:
 
     print("")
-    print("")
     print("**************************************************************************")
     print("Processing:")
     print("**************************************************************************")
     print("")
-    print("Processing data ...")
+    print("Processing data at " + str(datetime.datetime.now()) + " ...")
+    print("")
 
     # Receive image source
     frame = tensorflowLiteDetection2D_portIn.read()
@@ -264,38 +275,35 @@ while int(loopControlReceiveImageSource) == 0:
             x = (xMin + xMin + labelSize[0])/2
             y = image_h - labelYMin + baseLine - 10
 
-            # Get detection time
-            detectionTime = datetime.datetime.now()
-
             # Prepare coordinates and score
             coordinatesXY = str(x) + ", " + str(y)
             detectionScore = int(scores[i] * 100)
 
             # Print processed data
             print("")
-            print("")
             print("**************************************************************************")
-            print("Resume:")
+            print("Resume results:")
             print("**************************************************************************")
             print("")
-            print("[RESULTS] Detection: " + str(detectionObjectName) + " " + str(detectionScore) + "%")
-            print("[INFO] Coordinates:")
-            print("X: ", x)
-            print("Y: ", y)
-            print("[INFO] Detection time: " + str(detectionTime))
+            print("[RESULTS] tensorflowLiteDetection2D results:")
+            print("")
+            print("[DETECTION] Detection: " + str(detectionObjectName) + " " + str(detectionScore) + "%")
+            print("[COORDINATES] Coordinates: " + "X: " + str(x) + ", Y: " + str(y))
+            print("[DATE] Detection time: " + str(datetime.datetime.now()))
+            print("")
 
             # Sending processed detection
             outputBottleTensorflowLiteDetection2D.clear()
-            outputBottleTensorflowLiteDetection2D.addString("Detection number:")
+            outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
             outputBottleTensorflowLiteDetection2D.addInt(i)
-            outputBottleTensorflowLiteDetection2D.addString("Detection:")
+            outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
             outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
-            outputBottleTensorflowLiteDetection2D.addString("Score:")
+            outputBottleTensorflowLiteDetection2D.addString("SCORE:")
             outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
-            outputBottleTensorflowLiteDetection2D.addString("Coordinates:")
+            outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
             outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
-            outputBottleTensorflowLiteDetection2D.addString("Detection time:")
-            outputBottleTensorflowLiteDetection2D.addString(str(detectionTime))
+            outputBottleTensorflowLiteDetection2D.addString("DATE:")
+            outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
             tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
 
         elif scores[0] < 0.5:
@@ -303,26 +311,25 @@ while int(loopControlReceiveImageSource) == 0:
             print("[INFO] Object not detected.")
             print("")
 
-            # Get detection time
-            detectionTime = datetime.datetime.now()
-
             # Sending processed detection
             outputBottleTensorflowLiteDetection2D.clear()
-            outputBottleTensorflowLiteDetection2D.addString("Detection number:")
+            outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
             outputBottleTensorflowLiteDetection2D.addInt(i)
-            outputBottleTensorflowLiteDetection2D.addString("Detection:")
+            outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
             outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
-            outputBottleTensorflowLiteDetection2D.addString("Score:")
+            outputBottleTensorflowLiteDetection2D.addString("SCORE:")
             outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
-            outputBottleTensorflowLiteDetection2D.addString("Coordinates:")
+            outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
             outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
-            outputBottleTensorflowLiteDetection2D.addString("Detection time:")
-            outputBottleTensorflowLiteDetection2D.addString(str(detectionTime))
+            outputBottleTensorflowLiteDetection2D.addString("DATE:")
+            outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
             tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
 
     # Sending processed image
     print("")
-    print("[INFO] Sending processed image at " + str(detectionTime) + " ...")
+    print("[INFO] Sending processed image at " + str(datetime.datetime.now()) + " ...")
+    print("")
+
     out_buf_array[:,:] = in_buf_array
     tensorflowLiteDetection2D_portOut.write(out_buf_image)
 
