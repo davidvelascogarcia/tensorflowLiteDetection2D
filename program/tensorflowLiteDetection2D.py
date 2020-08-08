@@ -54,7 +54,6 @@ print("")
 print("Loading tensorflowLiteDetection2D module ...")
 print("")
 
-
 print("")
 print("**************************************************************************")
 print("YARP configuration:")
@@ -204,134 +203,141 @@ loopControlReceiveImageSource = 0
 
 while int(loopControlReceiveImageSource) == 0:
 
-    print("")
-    print("**************************************************************************")
-    print("Processing:")
-    print("**************************************************************************")
-    print("")
-    print("Processing data at " + str(datetime.datetime.now()) + " ...")
-    print("")
+    try:
 
-    # Receive image source
-    frame = tensorflowLiteDetection2D_portIn.read()
+        print("")
+        print("**************************************************************************")
+        print("Processing:")
+        print("**************************************************************************")
+        print("")
+        print("Processing data at " + str(datetime.datetime.now()) + " ...")
+        print("")
 
-    # Buffer processed image
-    in_buf_image.copy(frame)
-    assert in_buf_array.__array_interface__['data'][0] == in_buf_image.getRawImage().__int__()
+        # Receive image source
+        frame = tensorflowLiteDetection2D_portIn.read()
 
-    # YARP -> OpenCV
-    rgbFrame = in_buf_array[:, :, ::-1]
+        # Buffer processed image
+        in_buf_image.copy(frame)
+        assert in_buf_array.__array_interface__['data'][0] == in_buf_image.getRawImage().__int__()
 
-    # Prepare image
-    frameResized = cv2.resize(rgbFrame, (width, height))
-    inputData = np.expand_dims(frameResized, axis = 0)
+        # YARP -> OpenCV
+        rgbFrame = in_buf_array[:, :, ::-1]
 
-    # Normalize pixel values if using a floating model
-    if floating_model:
-        inputData = (np.float32(inputData) - inputMean) / inputSTD
+        # Prepare image
+        frameResized = cv2.resize(rgbFrame, (width, height))
+        inputData = np.expand_dims(frameResized, axis = 0)
 
-    # Set tensor
-    interpretObject.set_tensor(inputDetails[0]['index'], inputData)
-    interpretObject.invoke()
+        # Normalize pixel values if using a floating model
+        if floating_model:
+            inputData = (np.float32(inputData) - inputMean) / inputSTD
 
-    # Get results from tensor
-    boxes = interpretObject.get_tensor(outputDetails[0]['index'])[0]
-    classes = interpretObject.get_tensor(outputDetails[1]['index'])[0]
-    scores = interpretObject.get_tensor(outputDetails[2]['index'])[0]
+        # Set tensor
+        interpretObject.set_tensor(inputDetails[0]['index'], inputData)
+        interpretObject.invoke()
 
-    # Pre-configure detection values as "None":
-    detectionObjectName = "None"
-    detectionScore = 0
-    coordinatesXY = "None, None"
+        # Get results from tensor
+        boxes = interpretObject.get_tensor(outputDetails[0]['index'])[0]
+        classes = interpretObject.get_tensor(outputDetails[1]['index'])[0]
+        scores = interpretObject.get_tensor(outputDetails[2]['index'])[0]
 
-    print("detection " + str(scores[0]))
+        # Pre-configure detection values as "None":
+        detectionObjectName = "None"
+        detectionScore = 0
+        coordinatesXY = "None, None"
 
-    for i in range(len(scores)):
+        print("detection " + str(scores[0]))
 
-        if ((scores[i] > minThresholdConfig) and (scores[i] <= 1.0)):
+        for i in range(len(scores)):
 
-            # Put detection rectangle
-            yMin = int(max(1, (boxes[i][0] * image_h)))
-            xMin = int(max(1, (boxes[i][1] * image_w)))
-            yMax = int(min(image_h, (boxes[i][2] * image_h)))
-            xMax = int(min(image_w, (boxes[i][3] * image_w)))
+            if ((scores[i] > minThresholdConfig) and (scores[i] <= 1.0)):
 
-            # Paint rectabgle in detected object
-            cv2.rectangle(in_buf_array, (xMin, yMin), (xMax, yMax), (10, 255, 0), 2)
+                # Put detection rectangle
+                yMin = int(max(1, (boxes[i][0] * image_h)))
+                xMin = int(max(1, (boxes[i][1] * image_w)))
+                yMax = int(min(image_h, (boxes[i][2] * image_h)))
+                xMax = int(min(image_w, (boxes[i][3] * image_w)))
 
-            # Put label in OpenCV image
-            detectionObjectName = labels[int(classes[i])]
-            detectedObjectLabel = '%s: %d%%' % (detectionObjectName, int(scores[i] * 100))
-            labelSize, baseLine = cv2.getTextSize(detectedObjectLabel, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-            labelYMin = max(yMin, labelSize[1] + 10)
+                # Paint rectabgle in detected object
+                cv2.rectangle(in_buf_array, (xMin, yMin), (xMax, yMax), (10, 255, 0), 2)
 
-            # Paint rectangle to print name
-            cv2.rectangle(in_buf_array, (xMin, labelYMin - labelSize[1] - 10), (xMin + labelSize[0], labelYMin + baseLine - 10), (255, 255, 255), cv2.FILLED)
+                # Put label in OpenCV image
+                detectionObjectName = labels[int(classes[i])]
+                detectedObjectLabel = '%s: %d%%' % (detectionObjectName, int(scores[i] * 100))
+                labelSize, baseLine = cv2.getTextSize(detectedObjectLabel, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                labelYMin = max(yMin, labelSize[1] + 10)
 
-            # Paint name in rectangle
-            cv2.putText(in_buf_array, detectedObjectLabel, (xMin, labelYMin - 7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+                # Paint rectangle to print name
+                cv2.rectangle(in_buf_array, (xMin, labelYMin - labelSize[1] - 10), (xMin + labelSize[0], labelYMin + baseLine - 10), (255, 255, 255), cv2.FILLED)
 
-            # Get centroid coordinates
-            x = (xMin + xMin + labelSize[0])/2
-            y = image_h - labelYMin + baseLine - 10
+                # Paint name in rectangle
+                cv2.putText(in_buf_array, detectedObjectLabel, (xMin, labelYMin - 7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
-            # Prepare coordinates and score
-            coordinatesXY = str(x) + ", " + str(y)
-            detectionScore = int(scores[i] * 100)
+                # Get centroid coordinates
+                x = (xMin + xMin + labelSize[0])/2
+                y = image_h - labelYMin + baseLine - 10
 
-            # Print processed data
-            print("")
-            print("**************************************************************************")
-            print("Resume results:")
-            print("**************************************************************************")
-            print("")
-            print("[RESULTS] tensorflowLiteDetection2D results:")
-            print("")
-            print("[DETECTION] Detection: " + str(detectionObjectName) + " " + str(detectionScore) + "%")
-            print("[COORDINATES] Coordinates: " + "X: " + str(x) + ", Y: " + str(y))
-            print("[DATE] Detection time: " + str(datetime.datetime.now()))
-            print("")
+                # Prepare coordinates and score
+                coordinatesXY = str(x) + ", " + str(y)
+                detectionScore = int(scores[i] * 100)
 
-            # Sending processed detection
-            outputBottleTensorflowLiteDetection2D.clear()
-            outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
-            outputBottleTensorflowLiteDetection2D.addInt(i)
-            outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
-            outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
-            outputBottleTensorflowLiteDetection2D.addString("SCORE:")
-            outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
-            outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
-            outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
-            outputBottleTensorflowLiteDetection2D.addString("DATE:")
-            outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
-            tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
+                # Print processed data
+                print("")
+                print("**************************************************************************")
+                print("Resume results:")
+                print("**************************************************************************")
+                print("")
+                print("[RESULTS] tensorflowLiteDetection2D results:")
+                print("")
+                print("[DETECTION] Detection: " + str(detectionObjectName) + " " + str(detectionScore) + "%")
+                print("[COORDINATES] Coordinates: " + "X: " + str(x) + ", Y: " + str(y))
+                print("[DATE] Detection time: " + str(datetime.datetime.now()))
+                print("")
 
-        elif scores[0] < 0.5:
-            print("")
-            print("[INFO] Object not detected.")
-            print("")
+                # Sending processed detection
+                outputBottleTensorflowLiteDetection2D.clear()
+                outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
+                outputBottleTensorflowLiteDetection2D.addInt(i)
+                outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
+                outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
+                outputBottleTensorflowLiteDetection2D.addString("SCORE:")
+                outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
+                outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
+                outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
+                outputBottleTensorflowLiteDetection2D.addString("DATE:")
+                outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
+                tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
 
-            # Sending processed detection
-            outputBottleTensorflowLiteDetection2D.clear()
-            outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
-            outputBottleTensorflowLiteDetection2D.addInt(i)
-            outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
-            outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
-            outputBottleTensorflowLiteDetection2D.addString("SCORE:")
-            outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
-            outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
-            outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
-            outputBottleTensorflowLiteDetection2D.addString("DATE:")
-            outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
-            tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
+            elif scores[0] < 0.5:
+                print("")
+                print("[INFO] Object not detected.")
+                print("")
 
-    # Sending processed image
-    print("")
-    print("[INFO] Sending processed image at " + str(datetime.datetime.now()) + " ...")
-    print("")
+                # Sending processed detection
+                outputBottleTensorflowLiteDetection2D.clear()
+                outputBottleTensorflowLiteDetection2D.addString("NUMBER:")
+                outputBottleTensorflowLiteDetection2D.addInt(i)
+                outputBottleTensorflowLiteDetection2D.addString("DETECTION:")
+                outputBottleTensorflowLiteDetection2D.addString(detectionObjectName)
+                outputBottleTensorflowLiteDetection2D.addString("SCORE:")
+                outputBottleTensorflowLiteDetection2D.addInt(detectionScore)
+                outputBottleTensorflowLiteDetection2D.addString("COORDINATES:")
+                outputBottleTensorflowLiteDetection2D.addString(coordinatesXY)
+                outputBottleTensorflowLiteDetection2D.addString("DATE:")
+                outputBottleTensorflowLiteDetection2D.addString(str(datetime.datetime.now()))
+                tensorflowLiteDetection2D_portOutDet.write(outputBottleTensorflowLiteDetection2D)
 
-    out_buf_array[:,:] = in_buf_array
-    tensorflowLiteDetection2D_portOut.write(out_buf_image)
+        # Sending processed image
+        print("")
+        print("[INFO] Sending processed image at " + str(datetime.datetime.now()) + " ...")
+        print("")
+
+        out_buf_array[:,:] = in_buf_array
+        tensorflowLiteDetection2D_portOut.write(out_buf_image)
+
+    except:
+        print("")
+        print("[ERROR] Empty frame.")
+        print("")
 
 # Close YARP ports
 print("[INFO] Closing ports ...")
