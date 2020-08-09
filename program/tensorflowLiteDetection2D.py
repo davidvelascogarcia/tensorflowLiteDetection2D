@@ -245,8 +245,6 @@ while int(loopControlReceiveImageSource) == 0:
         detectionScore = 0
         coordinatesXY = "None, None"
 
-        print("detection " + str(scores[0]))
-
         for i in range(len(scores)):
 
             if ((scores[i] > minThresholdConfig) and (scores[i] <= 1.0)):
