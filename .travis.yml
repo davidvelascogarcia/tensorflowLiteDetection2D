@@ -58,11 +58,11 @@ install:
 
 # Instalar OpenCV
 
-  - sudo pip install opencv-python
+  - sudo pip3 install opencv-python
 
 # Instalar face_recognition
 
-  - sudo pip install tensorflow
+  - sudo pip3 install tensorflow
 
 # Tareas a ejecutar antes de nuestra prueba
 
