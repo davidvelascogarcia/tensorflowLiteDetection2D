@@ -70,7 +70,7 @@ install:
 
 before_script:
 
-  - cd program
+  - cd programs
 
 # Compilamos
 
