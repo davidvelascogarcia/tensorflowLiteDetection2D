@@ -60,7 +60,7 @@ install:
 
 # Instalar OpenCV
 
-  - sudo python -m pip install opencv-python
+  - sudo python3 -m pip install opencv-python
 
 # Instalar face_recognition
 
