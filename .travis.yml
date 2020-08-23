@@ -64,7 +64,7 @@ install:
 
 # Instalar face_recognition
 
-  - sudo python -m pip install tensorflow
+  - sudo python -m pip install tensorflow==1.13.1
 
 # Tareas a ejecutar antes de nuestra prueba
 
