@@ -50,7 +50,7 @@ install:
   - sudo apt-get install python3-pip
   - sudo python -m pip install setuptools
   - sudo python -m pip install scikit-build
-
+  - sudo python -m pip install enum34 --upgrade --ignore-installed
 # Instalar YARP
 
   - sudo sh -c 'echo "deb http://www.icub.org/ubuntu xenial contrib/science" > /etc/apt/sources.list.d/icub.list'
