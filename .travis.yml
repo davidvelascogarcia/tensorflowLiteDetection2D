@@ -12,7 +12,7 @@ os: linux
 
 # Distribución del sistema operativo
 
-dist: trusty
+dist: xenial
 
 # Requerimiento de permisos en Linux
 
@@ -51,14 +51,14 @@ install:
 
 # Instalar YARP
 
-  - sudo sh -c 'echo "deb http://www.icub.org/ubuntu trusty contrib/science" > /etc/apt/sources.list.d/icub.list'
+  - sudo sh -c 'echo "deb http://www.icub.org/ubuntu xenial contrib/science" > /etc/apt/sources.list.d/icub.list'
   - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57A5ACB6110576A6
   - sudo apt-get update
   - sudo apt-get install yarp
 
 # Instalar OpenCV
 
-  - sudo pip3 install opencv-python==3.4.10.37
+  - sudo pip3 install opencv-python
 
 # Instalar face_recognition
 
