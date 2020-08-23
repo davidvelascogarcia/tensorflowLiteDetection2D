@@ -48,8 +48,8 @@ install:
   - sudo apt-get -y install libxvidcore-dev libx264-dev
   - sudo apt-get -y install qt4-dev-tools libatlas-base-dev
   - sudo apt-get install python3-pip
-  - sudo python3.6 -m pip install setuptools
-  - sudo python3.6 -m pip install scikit-build
+  - sudo python -m pip install setuptools
+  - sudo python -m pip install scikit-build
 
 # Instalar YARP
 
@@ -60,11 +60,11 @@ install:
 
 # Instalar OpenCV
 
-  - sudo python3.6 -m pip install opencv-python
+  - sudo python -m pip install opencv-python
 
 # Instalar face_recognition
 
-  - sudo python3.6 -m pip install tensorflow
+  - sudo python -m pip install tensorflow
 
 # Tareas a ejecutar antes de nuestra prueba
 
